@@ -1,0 +1,123 @@
+import { AppData } from '../types';
+
+export const cleanAppData: AppData = {
+  profile: {
+    partner1: {
+      id: 'partner1',
+      name: 'Camilla',
+      nickname: 'Milla',
+      avatar: '👩🏻',
+      color: '#E07A8B',
+      city: 'João Pessoa - PB',
+    },
+    partner2: {
+      id: 'partner2',
+      name: 'Cassiane',
+      nickname: 'Cassi',
+      avatar: '👩🏽',
+      color: '#D4A373',
+      city: 'Porto Alegre - RS',
+    },
+    coupleName: 'Camilla & Cassiane',
+    anniversaryDate: '2026-07-01',
+    anniversaryNote: 'Meu coração fez a melhor escolha. 💕',
+    coverPhoto: 'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=1200&q=80',
+    security: {
+      partner1Pin: '1234',
+      partner2Pin: '5678',
+      couplePasscode: '2026',
+      requirePinOnEveryOpen: false,
+    },
+  },
+  movies: [],
+  recipes: [],
+  pantry: [],
+  groceries: [],
+  weeklyMenu: [],
+  calendarEvents: [],
+  calendar: [],
+  trips: [],
+  photos: [],
+  homeDecor: [],
+  homeTips: [],
+  notifications: [],
+  coupleDreams: [],
+  coupleSoundtrack: {
+    anthemSongId: undefined,
+    songs: [],
+    playlists: [],
+  },
+  weatherNotes: {
+    partner1Note: {
+      text: 'Amor, se cuida hoje nesse tempinho de Jampa e bebe bastante água! 💕',
+      author: 'partner1',
+      updatedAt: '2026-09-01T00:00:00.000Z',
+    },
+    partner2Note: {
+      text: 'Tá friozinho aí no Sul! Coloca um agasalho bem quentinho, meu bem 🧣',
+      author: 'partner2',
+      updatedAt: '2026-09-01T00:00:00.000Z',
+    },
+  },
+  customCategories: {
+    calendar: ['Dates Românticos', 'Consultas Médicas', 'Idas ao Mercado', 'Tarefas de Casa', 'Viagens'],
+    recipes: [],
+    movies: [],
+  },
+  consumption: {
+    activeMonthKey: '2026-09',
+    monthsRecords: {
+      '2026-09': {
+        monthKey: '2026-09',
+        monthLabel: 'Setembro 2026',
+        rentSpent: 0,
+        electricitySpent: 0,
+        waterSpent: 0,
+        internetSpent: 0,
+        creditCardSpent: 0,
+        paidStatus: {
+          rent: false,
+          water: false,
+          electricity: false,
+          internet: false,
+          creditCard: false,
+        },
+        billAuthors: {
+          rent: 'partner1',
+          electricity: 'partner2',
+          water: 'partner1',
+          internet: 'partner2',
+          creditCard: 'partner1',
+        },
+        billPaidBy: {},
+        billDueDates: {
+          rent: '10',
+          electricity: '15',
+          water: '20',
+          internet: '25',
+          creditCard: '05',
+        },
+        customExpenses: [],
+      },
+    },
+    rentSpent: 0,
+    electricitySpent: 0,
+    waterSpent: 0,
+    internetSpent: 0,
+    creditCardSpent: 0,
+    paidStatus: {
+      rent: false,
+      water: false,
+      electricity: false,
+      internet: false,
+      creditCard: false,
+    },
+    customExpenses: [],
+    monthlyHistory: [],
+  },
+  lastModified: 0,
+  isCleaned: false,
+};
+
+export const initialAppData: AppData = cleanAppData;
+export const initialCoupleData = cleanAppData;

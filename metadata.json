@@ -1,0 +1,6 @@
+{
+  "name": "Nosso Canto",
+  "description": "Espaço privativo a dois de Camilla e Cassiane: contas do mês, listas, nosso lar, viagens e memórias.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

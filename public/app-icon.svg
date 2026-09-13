@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F296A5" />
+      <stop offset="50%" stop-color="#E07A8B" />
+      <stop offset="100%" stop-color="#C2596C" />
+    </linearGradient>
+    <linearGradient id="roofGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#FFF0F2" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#731828" flood-opacity="0.25" />
+    </filter>
+  </defs>
+
+  <!-- Background with smooth iOS-style squircle -->
+  <rect width="512" height="512" rx="115" fill="url(#bgGrad)" />
+
+  <!-- Subtle glow ring inside -->
+  <rect x="12" y="12" width="488" height="488" rx="103" fill="none" stroke="#FFFFFF" stroke-opacity="0.2" stroke-width="4" />
+
+  <!-- House + Heart Group with Drop Shadow -->
+  <g filter="url(#shadow)">
+    <!-- Roof / Cottage Structure -->
+    <path d="M 256 128 L 138 236 C 131 242 135 254 145 254 L 172 254 L 172 376 C 172 387 181 396 192 396 L 320 396 C 331 396 340 387 340 376 L 340 254 L 367 254 C 377 254 381 242 374 236 Z" 
+          fill="url(#roofGrad)" />
+
+    <!-- Romantic Heart in Center -->
+    <path d="M 256 250
+             C 246 230 220 220 200 236
+             C 176 256 182 288 214 316
+             L 256 352
+             L 298 316
+             C 330 288 336 256 312 236
+             C 292 220 266 230 256 250 Z"
+          fill="#E07A8B" />
+
+    <!-- Sparkle Stars -->
+    <circle cx="360" cy="170" r="10" fill="#FFFFFF" opacity="0.9" />
+    <circle cx="152" cy="182" r="7" fill="#FFFFFF" opacity="0.8" />
+  </g>
+</svg>

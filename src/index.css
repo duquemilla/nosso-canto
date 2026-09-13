@@ -1,0 +1,346 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root,
+  [data-theme="rose"] {
+    --bg-main: #FDF9FA;
+    --card-bg: #FFFFFF;
+    --card-border: #F3DDE3;
+    --text-main: #2D2327;
+    --text-muted: #7D6F74;
+    --rose-accent: #E07A8B;
+    --rose-soft: #FFF0F3;
+    --border-accent: #D9657A;
+    --pill-bg: #FFF0F3;
+    --pill-border: #F2BDC8;
+    --pill-text: #6B3441;
+    --pill-active-bg: #FDE2E7;
+    --pill-active-border: #D9657A;
+    --pill-active-text: #8E1F35;
+    --badge-bg: #FFE4EA;
+    --badge-text: #9E2B43;
+  }
+
+  /* Default Dark Mode (Rose Romântico Dark) */
+  .dark,
+  [data-theme="rose"].dark,
+  .dark[data-theme="rose"],
+  html.dark[data-theme="rose"] {
+    --bg-main: #1C1518;
+    --card-bg: #271E23;
+    --card-border: #3D2F36;
+    --text-main: #FAF4F0;
+    --text-muted: #B8A8AF;
+    --rose-accent: #F295A6;
+    --rose-soft: #332027;
+    --border-accent: #E07A8B;
+    --pill-bg: #2D1D23;
+    --pill-border: #4D313C;
+    --pill-text: #EFCBD5;
+    --pill-active-bg: #422530;
+    --pill-active-border: #F295A6;
+    --pill-active-text: #FFF0F4;
+    --badge-bg: #3D222D;
+    --badge-text: #F7A6B6;
+  }
+
+  /* Lavender & Dream Theme 💜 */
+  [data-theme="lavender"] {
+    --bg-main: #FAF7FD;
+    --card-bg: #FFFFFF;
+    --card-border: #E8DEEE;
+    --text-main: #251D2C;
+    --text-muted: #74677E;
+    --rose-accent: #9A74B8;
+    --rose-soft: #F5EEFB;
+    --border-accent: #8E60B2;
+    --pill-bg: #F5EEFB;
+    --pill-border: #DAC2EE;
+    --pill-text: #533370;
+    --pill-active-bg: #EDE0F7;
+    --pill-active-border: #8E60B2;
+    --pill-active-text: #5E268C;
+    --badge-bg: #EFE4F9;
+    --badge-text: #672F99;
+  }
+  [data-theme="lavender"].dark,
+  .dark[data-theme="lavender"] {
+    --bg-main: #18141F;
+    --card-bg: #231C2C;
+    --card-border: #3A2F45;
+    --text-main: #F6F3FA;
+    --text-muted: #B3A7BF;
+    --rose-accent: #B892D8;
+    --rose-soft: #2D2039;
+    --border-accent: #A572CE;
+    --pill-bg: #281D33;
+    --pill-border: #4D3762;
+    --pill-text: #E5D6F2;
+    --pill-active-bg: #3E2452;
+    --pill-active-border: #B892D8;
+    --pill-active-text: #FAF3FF;
+    --badge-bg: #382447;
+    --badge-text: #D5B4F2;
+  }
+
+  /* Sage & Matcha Botânico Theme 🌿 */
+  [data-theme="sage"] {
+    --bg-main: #F5F9F5;
+    --card-bg: #FFFFFF;
+    --card-border: #DEEADE;
+    --text-main: #1B281C;
+    --text-muted: #647565;
+    --rose-accent: #5F8F6E;
+    --rose-soft: #EEF6EF;
+    --border-accent: #4B7D5A;
+    --pill-bg: #EEF6EF;
+    --pill-border: #BED8C3;
+    --pill-text: #2A5436;
+    --pill-active-bg: #E1EFE3;
+    --pill-active-border: #4B7D5A;
+    --pill-active-text: #1C482A;
+    --badge-bg: #E4F1E6;
+    --badge-text: #235A34;
+  }
+  [data-theme="sage"].dark,
+  .dark[data-theme="sage"] {
+    --bg-main: #121A14;
+    --card-bg: #1B261D;
+    --card-border: #2D3D30;
+    --text-main: #F1F7F2;
+    --text-muted: #A3B5A5;
+    --rose-accent: #7DB890;
+    --rose-soft: #223526;
+    --border-accent: #6AA57E;
+    --pill-bg: #1C2E21;
+    --pill-border: #33543B;
+    --pill-text: #D8EDDC;
+    --pill-active-bg: #26432E;
+    --pill-active-border: #7DB890;
+    --pill-active-text: #F3FAF5;
+    --badge-bg: #213B28;
+    --badge-text: #96CEAA;
+  }
+
+  /* Peach & Sunset Terracota Theme 🍑 */
+  [data-theme="peach"] {
+    --bg-main: #FCF7F3;
+    --card-bg: #FFFFFF;
+    --card-border: #F5E5D8;
+    --text-main: #2C211A;
+    --text-muted: #7E6B61;
+    --rose-accent: #E0825B;
+    --rose-soft: #FFF2EB;
+    --border-accent: #CE683B;
+    --pill-bg: #FFF2EB;
+    --pill-border: #F7D0BA;
+    --pill-text: #78381A;
+    --pill-active-bg: #FEE4D5;
+    --pill-active-border: #CE683B;
+    --pill-active-text: #8E330A;
+    --badge-bg: #FDE8DC;
+    --badge-text: #A03E14;
+  }
+  [data-theme="peach"].dark,
+  .dark[data-theme="peach"] {
+    --bg-main: #1C1511;
+    --card-bg: #291E18;
+    --card-border: #423026;
+    --text-main: #FAF3EF;
+    --text-muted: #BFABA1;
+    --rose-accent: #F29E79;
+    --rose-soft: #38241B;
+    --border-accent: #DE8055;
+    --pill-bg: #301E15;
+    --pill-border: #5A3624;
+    --pill-text: #F8D8C8;
+    --pill-active-bg: #442617;
+    --pill-active-border: #F29E79;
+    --pill-active-text: #FFF3EB;
+    --badge-bg: #3F2315;
+    --badge-text: #F7B596;
+  }
+
+  /* Sky & Ocean Theme 🌊 */
+  [data-theme="sky"] {
+    --bg-main: #F4F8FA;
+    --card-bg: #FFFFFF;
+    --card-border: #DDEBF1;
+    --text-main: #18232B;
+    --text-muted: #647582;
+    --rose-accent: #4A8DB7;
+    --rose-soft: #EBF4F9;
+    --border-accent: #377B9F;
+    --pill-bg: #EBF4F9;
+    --pill-border: #BDDCE9;
+    --pill-text: #24526E;
+    --pill-active-bg: #DEEEF6;
+    --pill-active-border: #377B9F;
+    --pill-active-text: #134665;
+    --badge-bg: #E1EFF6;
+    --badge-text: #1C5B82;
+  }
+  [data-theme="sky"].dark,
+  .dark[data-theme="sky"] {
+    --bg-main: #10161B;
+    --card-bg: #17222A;
+    --card-border: #273743;
+    --text-main: #EEF6FA;
+    --text-muted: #9EAFBC;
+    --rose-accent: #6EB2DD;
+    --rose-soft: #1E313D;
+    --border-accent: #5296BE;
+    --pill-bg: #162833;
+    --pill-border: #29475A;
+    --pill-text: #D2E8F4;
+    --pill-active-bg: #1F3A4B;
+    --pill-active-border: #6EB2DD;
+    --pill-active-text: #F3F9FC;
+    --badge-bg: #1A3444;
+    --badge-text: #89C7ED;
+  }
+
+  /* Pokémon Pikachu & Adventure Theme ⚡ */
+  [data-theme="pokemon"] {
+    --bg-main: #FEFDF5;
+    --card-bg: #FFFFFF;
+    --card-border: #F5ECC4;
+    --text-main: #2A230F;
+    --text-muted: #796C46;
+    --rose-accent: #E09F1B;
+    --rose-soft: #FFF9E6;
+    --border-accent: #C78204;
+    --pill-bg: #FFF9E6;
+    --pill-border: #F7DF8D;
+    --pill-text: #6B4E08;
+    --pill-active-bg: #FEF0C7;
+    --pill-active-border: #C78204;
+    --pill-active-text: #784200;
+    --badge-bg: #FEF3C7;
+    --badge-text: #92400E;
+  }
+  [data-theme="pokemon"].dark,
+  .dark[data-theme="pokemon"] {
+    --bg-main: #1A170F;
+    --card-bg: #272317;
+    --card-border: #3F3825;
+    --text-main: #FBF8EB;
+    --text-muted: #BEB28F;
+    --rose-accent: #F7BA3B;
+    --rose-soft: #38301B;
+    --border-accent: #E0A122;
+    --pill-bg: #302814;
+    --pill-border: #56461D;
+    --pill-text: #F7E7B5;
+    --pill-active-bg: #443717;
+    --pill-active-border: #F7BA3B;
+    --pill-active-text: #FFF9E0;
+    --badge-bg: #403413;
+    --badge-text: #F9CA5B;
+  }
+
+  html {
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: pan-y;
+    overscroll-behavior-x: none;
+  }
+
+  body {
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    transition: background-color 0.25s ease, color 0.25s ease;
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
+    min-height: 100vh;
+    min-height: 100dvh;
+    touch-action: pan-y;
+    overscroll-behavior-x: none;
+    -webkit-overflow-scrolling: touch;
+    position: relative;
+  }
+
+  #root {
+    background-color: var(--bg-main);
+    width: 100%;
+    max-width: 100vw;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Prevent iOS Safari auto-zoom on input focus by ensuring minimum 16px font size */
+  @media (max-width: 640px) {
+    input, select, textarea {
+      font-size: 16px !important;
+    }
+  }
+}
+
+/* Custom UI Pill Classes that respect the active theme perfectly */
+.theme-pill-btn {
+  background-color: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  border-radius: 9999px;
+  font-weight: 500;
+  transition: all 0.15s ease-in-out;
+}
+.theme-pill-btn:hover {
+  background-color: var(--pill-bg);
+  border-color: var(--pill-border);
+  color: var(--pill-text);
+}
+.theme-pill-btn.active,
+.theme-pill-btn[data-active="true"] {
+  background-color: var(--pill-active-bg) !important;
+  border: 1.5px solid var(--pill-active-border) !important;
+  color: var(--pill-active-text) !important;
+  font-weight: 700 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Hide scrollbar utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--pill-border);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-accent);
+}
+
+/* Prevent viewport and modal horizontal wobbling on mobile touch gestures */
+html, body {
+  overflow-x: hidden;
+  overscroll-behavior-x: none;
+  -webkit-text-size-adjust: 100%;
+}
+
+
