@@ -10,7 +10,7 @@ export interface Partner {
 }
 
 export interface CoupleSecuritySettings {
-  partner1Pin?: string; // Default: '1234'
+  partner1Pin?: string; // Default: '2604'
   partner2Pin?: string; // Default: '5678'
   couplePasscode?: string; // Default: '2026'
   requirePinOnEveryOpen?: boolean;

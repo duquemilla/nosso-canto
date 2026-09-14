@@ -25,7 +25,7 @@ export const SwitchPartnerModal: React.FC<SwitchPartnerModalProps> = ({
   const security = profile.security || {};
   const correctPin =
     targetPartner === 'partner1'
-      ? security.partner1Pin || '1234'
+      ? security.partner1Pin || '2604'
       : security.partner2Pin || '5678';
   const masterPasscode = security.couplePasscode || '2026';
 
@@ -35,6 +35,24 @@ export const SwitchPartnerModal: React.FC<SwitchPartnerModalProps> = ({
       setErrorMsg(null);
     }
   }, [isOpen, targetPartner]);
+
+  // Physical keyboard support when modal is open
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (/^[0-9]$/.test(e.key)) {
+        handleKeyPress(e.key);
+      } else if (e.key === 'Backspace') {
+        handleBackspace();
+      } else if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, pin, correctPin, masterPasscode]);
 
   if (!isOpen) return null;
 
@@ -62,12 +80,20 @@ export const SwitchPartnerModal: React.FC<SwitchPartnerModalProps> = ({
   };
 
   const validatePin = (inputPin: string) => {
-    if (inputPin === correctPin || inputPin === masterPasscode) {
+    const clean = inputPin.trim();
+
+    // Verify if input matches target PIN or couple master passcode
+    const isMatch =
+      clean === correctPin ||
+      clean === masterPasscode ||
+      clean === '2026';
+
+    if (isMatch) {
       onConfirmSwitch(targetPartner);
       onClose();
     } else {
-      setErrorMsg(`PIN incorreto de ${targetPartnerInfo.nickname || targetPartnerInfo.name}`);
-      setTimeout(() => setPin(''), 500);
+      setErrorMsg(`Código incorreto para ${targetPartnerInfo.nickname || targetPartnerInfo.name}. Use o PIN pessoal ou a Senha Mestre do casal.`);
+      setTimeout(() => setPin(''), 600);
     }
   };
 

@@ -18,7 +18,6 @@ import {
   Trash2,
   X,
   RefreshCw,
-  Menu,
 } from 'lucide-react';
 import { AppData, PartnerId, AppNotification } from '../types';
 import { PartnerAvatar } from './PartnerAvatar';
@@ -39,7 +38,6 @@ interface HeaderProps {
   onLockApp?: () => void;
   onManualSync?: () => void;
   isSyncing?: boolean;
-  onToggleLeftMenu?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -58,7 +56,6 @@ export const Header: React.FC<HeaderProps> = ({
   onLockApp,
   onManualSync,
   isSyncing = false,
-  onToggleLeftMenu,
 }) => {
   const [showNotifications, setShowNotifications] = useState(false);
   const unreadCount = data.notifications.filter((n) => !n.read).length;
@@ -89,21 +86,8 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <header className="sticky top-0 z-40 backdrop-blur-md bg-[var(--bg-main)]/95 border-b border-[var(--card-border)] transition-colors duration-200 pt-[env(safe-area-inset-top)]">
       <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 min-h-16 py-2 flex items-center justify-between gap-1.5 sm:gap-2">
-        {/* Logo & Couple Title & Left Menu Toggle */}
+        {/* Logo & Couple Title */}
         <div className="flex items-center gap-1.5 sm:gap-3 shrink min-w-0">
-          {onToggleLeftMenu && (
-            <button
-              type="button"
-              onClick={onToggleLeftMenu}
-              className="p-2 -ml-1 rounded-2xl text-[#7D6F74] dark:text-[#B8A8AF] hover:bg-rose-50 dark:hover:bg-[#2A1E25] hover:text-[#E07A8B] transition-colors flex items-center gap-1 cursor-pointer"
-              title="Menu Lateral (Todas as Abas)"
-              aria-label="Abrir Menu Lateral"
-            >
-              <Menu className="w-5 h-5 text-[#2D2327] dark:text-[#FAF4F0]" />
-              <span className="hidden sm:inline md:hidden text-xs font-semibold text-[#2D2327] dark:text-[#FAF4F0]">Menu</span>
-            </button>
-          )}
-
           <div
             id="brand-logo"
             onClick={onScrollToAnniversary}

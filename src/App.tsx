@@ -58,7 +58,6 @@ import {
   X,
   Lock,
   Settings,
-  Menu,
   Bot,
 } from 'lucide-react';
 
@@ -66,6 +65,7 @@ const LOCAL_STORAGE_KEY = 'nos_dois_app_data_cache';
 const LOCAL_STORAGE_PARTNER = 'nos_dois_active_partner';
 const LOCAL_STORAGE_DARK = 'nos_dois_dark_mode';
 const LOCAL_STORAGE_SESSION_UNLOCKED = 'nos_dois_session_unlocked';
+const LOCAL_STORAGE_DEVICE_UNLOCKED = 'nos_dois_device_unlocked';
 
 export default function App() {
   // Global App Data State
@@ -110,7 +110,6 @@ export default function App() {
   });
 
   const [activeTab, setActiveTab] = useState<ActiveTab>('home');
-  const [isLeftDrawerOpen, setIsLeftDrawerOpen] = useState<boolean>(false);
   const [isMobileMoreOpen, setIsMobileMoreOpen] = useState<boolean>(false);
   const [isOnline, setIsOnline] = useState<boolean>(false);
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
@@ -122,8 +121,12 @@ export default function App() {
   // Security & Lock screen state
   const [isLocked, setIsLocked] = useState<boolean>(() => {
     try {
-      const unlocked = sessionStorage.getItem(LOCAL_STORAGE_SESSION_UNLOCKED);
-      if (unlocked === 'true') {
+      const sessionUnlocked = sessionStorage.getItem(LOCAL_STORAGE_SESSION_UNLOCKED);
+      if (sessionUnlocked === 'true') {
+        return false;
+      }
+      const deviceUnlocked = localStorage.getItem(LOCAL_STORAGE_DEVICE_UNLOCKED);
+      if (deviceUnlocked === 'true') {
         return false;
       }
     } catch {}
@@ -136,6 +139,7 @@ export default function App() {
     try {
       sessionStorage.setItem(LOCAL_STORAGE_SESSION_UNLOCKED, 'true');
       if (rememberDevice) {
+        localStorage.setItem(LOCAL_STORAGE_DEVICE_UNLOCKED, 'true');
         localStorage.setItem(LOCAL_STORAGE_PARTNER, partner);
       }
     } catch {}
@@ -145,7 +149,47 @@ export default function App() {
     setIsLocked(true);
     try {
       sessionStorage.removeItem(LOCAL_STORAGE_SESSION_UNLOCKED);
+      localStorage.removeItem(LOCAL_STORAGE_DEVICE_UNLOCKED);
     } catch {}
+  };
+
+  const handleResetPins = () => {
+    setData((prev) => {
+      const updated: AppData = {
+        ...prev,
+        profile: {
+          ...prev.profile,
+          security: {
+            partner1Pin: '2604',
+            partner2Pin: '5678',
+            couplePasscode: '2026',
+            requirePinOnEveryOpen: false,
+          },
+        },
+      };
+      updateAndSyncData(updated);
+      return updated;
+    });
+  };
+
+  const handleUpdatePin = (partner: PartnerId, newPin: string) => {
+    const trimmedPin = newPin.trim();
+    if (!trimmedPin || trimmedPin.length < 4) return;
+    setData((prev) => {
+      const updated: AppData = {
+        ...prev,
+        profile: {
+          ...prev.profile,
+          security: {
+            ...prev.profile.security,
+            partner1Pin: partner === 'partner1' ? trimmedPin : (prev.profile.security?.partner1Pin || '2604'),
+            partner2Pin: partner === 'partner2' ? trimmedPin : (prev.profile.security?.partner2Pin || '5678'),
+          },
+        },
+      };
+      updateAndSyncData(updated);
+      return updated;
+    });
   };
 
   // Apply dark mode class to documentElement
@@ -1070,6 +1114,8 @@ export default function App() {
         profile={data.profile}
         activePartner={activePartner}
         onUnlock={handleUnlock}
+        onResetPins={handleResetPins}
+        onUpdatePin={handleUpdatePin}
         darkMode={darkMode}
         onToggleDarkMode={handleToggleDarkMode}
       />
@@ -1094,62 +1140,11 @@ export default function App() {
         isOnline={isOnline}
         onManualSync={handleManualSync}
         isSyncing={isSyncing}
-        onToggleLeftMenu={() => setIsLeftDrawerOpen((prev) => !prev)}
         onScrollToAnniversary={() => {
           setActiveTab('home');
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
       />
-
-      {/* Mobile / Narrow Screen Left Sidebar Drawer */}
-      {isLeftDrawerOpen && (
-        <div className="md:hidden fixed inset-0 z-50 flex" role="dialog" aria-modal="true">
-          <div
-            className="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity animate-in fade-in duration-200"
-            onClick={() => setIsLeftDrawerOpen(false)}
-          />
-          <div className="relative w-80 max-w-[85vw] bg-[#FAF8F5] dark:bg-[#1E161B] h-full shadow-2xl flex flex-col p-4 z-10 overflow-y-auto animate-in slide-in-from-left duration-200">
-            <div className="flex items-center justify-between pb-3.5 border-b border-[#F2E8E4] dark:border-[#3D2F36]">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-2xl bg-gradient-to-tr from-[#E07A8B] to-[#F4A6B3] flex items-center justify-center text-white shadow-sm">
-                  <Heart className="w-4 h-4 fill-white text-white" />
-                </div>
-                <div>
-                  <h3 className="font-serif font-bold text-sm text-[#2D2327] dark:text-[#FAF4F0]">
-                    Nosso Canto
-                  </h3>
-                  <p className="text-[11px] text-[#7D6F74] dark:text-[#B8A8AF]">
-                    Menu Lateral do Casal 💕
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsLeftDrawerOpen(false)}
-                className="p-1.5 rounded-xl text-[#7D6F74] hover:bg-rose-50 dark:hover:bg-[#2A1E25] cursor-pointer"
-                title="Fechar menu lateral"
-              >
-                <X className="w-5 h-5 text-[#2D2327] dark:text-[#FAF4F0]" />
-              </button>
-            </div>
-
-            <div className="mt-3 flex-1">
-              <Navigation
-                layout="sidebar"
-                activeTab={activeTab}
-                onChangeTab={(tab) => {
-                  setActiveTab(tab);
-                  setIsLeftDrawerOpen(false);
-                }}
-                badgeCounts={{
-                  moviesToWatch: data.movies.filter((m) => m.status === 'to_watch').length,
-                  groceryPending: data.groceries.filter((g) => !g.checked).length,
-                }}
-              />
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Main Page Layout with Left Sidebar on Desktop */}
       <div className="flex-1 w-full max-w-[1720px] mx-auto px-3 sm:px-6 lg:px-8 py-4 flex flex-col md:flex-row gap-6">
@@ -1170,32 +1165,6 @@ export default function App() {
 
         {/* Main Content Area */}
         <main className="flex-1 min-w-0 pb-24 md:pb-16 space-y-4">
-          {/* Mobile Only: Quick left menu bar */}
-          <div className="md:hidden flex items-center justify-between p-2.5 rounded-2xl bg-white dark:bg-[#20181D] border border-[#F2E8E4] dark:border-[#3D2F36] shadow-2xs">
-            <button
-              type="button"
-              onClick={() => setIsLeftDrawerOpen(true)}
-              className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#E07A8B] to-[#F4A6B3] text-white font-semibold text-xs shadow-xs cursor-pointer active:scale-95 transition-transform"
-            >
-              <Menu className="w-4 h-4" />
-              <span>Menu Lateral (Todas as Abas)</span>
-            </button>
-            <span className="text-xs font-bold text-[#7D6F74] dark:text-[#B8A8AF] pr-2">
-              {activeTab === 'home' && '🏠 Início'}
-              {activeTab === 'games' && '🧩 Joguinhos 💕'}
-              {activeTab === 'movies' && '🎬 Filmes & Séries'}
-              {activeTab === 'recipes' && '🍳 Receitas do Casal'}
-              {activeTab === 'calendar' && '📅 Agenda & Datas'}
-              {activeTab === 'pantry_grocery' && '🛒 Mercado & Despensa'}
-              {activeTab === 'photos' && '📸 Álbum de Fotos'}
-              {activeTab === 'trips' && '✈️ Nossas Viagens'}
-              {activeTab === 'home_decor' && '🪴 Nosso Lar & Plantas'}
-              {activeTab === 'consumption' && '💰 Gastos & Contas'}
-              {activeTab === 'lumina' && '✨ Lumina AI'}
-              {activeTab === 'sintonia' && '💕 Sintonia'}
-            </span>
-          </div>
-
           {/* View Switcher */}
           <div className="pt-1">
           {activeTab === 'home' && (
@@ -1618,15 +1587,15 @@ export default function App() {
         </button>
 
         <button
-          onClick={() => setIsLeftDrawerOpen(true)}
+          onClick={() => setIsMobileMoreOpen((prev) => !prev)}
           className={`flex-1 flex flex-col items-center justify-center py-2 px-0.5 rounded-2xl text-[11px] transition-all min-h-[50px] touch-manipulation active:scale-95 ${
-            isLeftDrawerOpen
+            isMobileMoreOpen
               ? 'text-[#E07A8B] font-bold bg-rose-50/70 dark:bg-rose-950/40'
               : 'text-[#7D6F74] dark:text-[#B8A8AF] hover:text-[#2D2327]'
           }`}
         >
-          <Menu className="w-5 h-5" />
-          <span className="mt-1 whitespace-nowrap">Menu Lateral</span>
+          <MoreHorizontal className="w-5 h-5" />
+          <span className="mt-1 whitespace-nowrap">Mais</span>
         </button>
       </div>
 

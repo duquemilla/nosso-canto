@@ -120,7 +120,7 @@ export const CoupleSettingsModal: React.FC<CoupleSettingsModalProps> = ({
 
   // Security / PINs Form State
   const sec = profile.security || {};
-  const [partner1Pin, setPartner1Pin] = useState(sec.partner1Pin || '1234');
+  const [partner1Pin, setPartner1Pin] = useState(sec.partner1Pin || '2604');
   const [partner2Pin, setPartner2Pin] = useState(sec.partner2Pin || '5678');
   const [couplePasscode, setCouplePasscode] = useState(sec.couplePasscode || '2026');
   const [requirePinOnEveryOpen, setRequirePinOnEveryOpen] = useState(
@@ -143,7 +143,7 @@ export const CoupleSettingsModal: React.FC<CoupleSettingsModalProps> = ({
       setPartner2Avatar(profile.partner2.avatar);
       setPartner2City(profile.partner2.city || 'Porto Alegre - RS');
       const s = profile.security || {};
-      setPartner1Pin(s.partner1Pin || '1234');
+      setPartner1Pin(s.partner1Pin || '2604');
       setPartner2Pin(s.partner2Pin || '5678');
       setCouplePasscode(s.couplePasscode || '2026');
       setRequirePinOnEveryOpen(!!s.requirePinOnEveryOpen);
@@ -225,8 +225,8 @@ export const CoupleSettingsModal: React.FC<CoupleSettingsModalProps> = ({
       },
       security: {
         partner1Pin: activePartner === 'partner2'
-          ? (profile.security?.partner1Pin || '1234')
-          : (partner1Pin.trim() || profile.security?.partner1Pin || '1234'),
+          ? (profile.security?.partner1Pin || '2604')
+          : (partner1Pin.trim() || profile.security?.partner1Pin || '2604'),
         partner2Pin: activePartner === 'partner1'
           ? (profile.security?.partner2Pin || '5678')
           : (partner2Pin.trim() || profile.security?.partner2Pin || '5678'),
@@ -838,7 +838,7 @@ export const CoupleSettingsModal: React.FC<CoupleSettingsModalProps> = ({
                         ? 'bg-zinc-100/60 dark:bg-zinc-900/60 border-zinc-200 dark:border-zinc-800 text-zinc-400 cursor-not-allowed'
                         : 'bg-white dark:bg-[#1F171C] border-[#F2E8E4] dark:border-[#3D2F36] text-[#2D2327] dark:text-[#FAF4F0] focus:ring-2 focus:ring-[#E07A8B]'
                     }`}
-                    placeholder="1234"
+                    placeholder="2604"
                   />
                   <span className="text-[10px] text-[#A6999F] block mt-1">
                     {activePartner === 'partner2'

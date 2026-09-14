@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import {
   Sun,
   CloudSun,
@@ -65,8 +66,6 @@ export const CoupleWeatherCare: React.FC<CoupleWeatherCareProps> = ({
   });
 
   const [isLoading, setIsLoading] = useState(false);
-  const [millaNoteIndex, setMillaNoteIndex] = useState(0);
-  const [cassiNoteIndex, setCassiNoteIndex] = useState(0);
 
   // Modal State for Writing or Generating AI Weather Notes
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -98,6 +97,28 @@ export const CoupleWeatherCare: React.FC<CoupleWeatherCareProps> = ({
     const interval = setInterval(fetchWeather, 15 * 60 * 1000);
     return () => clearInterval(interval);
   }, []);
+
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    if (isModalOpen) {
+      const prevOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = prevOverflow;
+      };
+    }
+  }, [isModalOpen]);
+
+  // Close modal on Escape key press
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isModalOpen) {
+        setIsModalOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isModalOpen]);
 
   const getWeatherIcon = (code: number, temp: number) => {
     if ([51, 53, 55, 61, 63, 65, 80, 81, 82, 95].includes(code)) {
@@ -138,7 +159,8 @@ export const CoupleWeatherCare: React.FC<CoupleWeatherCareProps> = ({
   const handleOpenNoteModal = (target: PartnerId) => {
     setTargetPartner(target);
     const existing = target === 'partner1' ? weatherNotes?.partner1Note : weatherNotes?.partner2Note;
-    setNoteText(existing?.text || '');
+    const defaultPreset = target === 'partner1' ? millaPresets[0] : cassiPresets[0];
+    setNoteText(existing?.text || defaultPreset);
     setAiPromptHint('');
     setSaveSuccess(false);
     setIsModalOpen(true);
@@ -180,16 +202,16 @@ export const CoupleWeatherCare: React.FC<CoupleWeatherCareProps> = ({
   };
 
   const handleSaveNote = () => {
-    const sender = activePartner === 'partner1' ? profile.partner1.name : profile.partner2.name;
-    if (noteText.trim()) {
-      onUpdateWeatherNote?.(targetPartner, {
-        text: noteText.trim(),
-        author: sender,
-        updatedAt: new Date().toISOString(),
-      });
-    } else {
-      onUpdateWeatherNote?.(targetPartner, null);
-    }
+    const sender = activePartner === 'partner1'
+      ? profile.partner1.nickname || profile.partner1.name
+      : profile.partner2.nickname || profile.partner2.name;
+    const textToSave = noteText.trim() || (targetPartner === 'partner1' ? millaPresets[0] : cassiPresets[0]);
+
+    onUpdateWeatherNote?.(targetPartner, {
+      text: textToSave,
+      author: sender,
+      updatedAt: new Date().toISOString(),
+    });
     setSaveSuccess(true);
     setTimeout(() => {
       setIsModalOpen(false);
@@ -198,35 +220,18 @@ export const CoupleWeatherCare: React.FC<CoupleWeatherCareProps> = ({
   };
 
   const handleResetNote = () => {
-    onUpdateWeatherNote?.(targetPartner, null);
-    setNoteText('');
-    setSaveSuccess(true);
-    setTimeout(() => {
-      setIsModalOpen(false);
-      setSaveSuccess(false);
-    }, 400);
-  };
-
-  const handleCyclePresetAndSave = (partner: PartnerId) => {
-    const isP1 = partner === 'partner1';
-    const presets = isP1 ? millaPresets : cassiPresets;
-    const currentText = isP1 ? p1CustomNote?.text : p2CustomNote?.text;
-    const foundIdx = presets.findIndex((p) => p === currentText);
-    const nextIndex = foundIdx >= 0 ? (foundIdx + 1) % presets.length : (isP1 ? (millaNoteIndex + 1) % presets.length : (cassiNoteIndex + 1) % presets.length);
-
-    if (isP1) setMillaNoteIndex(nextIndex);
-    else setCassiNoteIndex(nextIndex);
-
-    const sender = activePartner === 'partner1' ? profile.partner1.name : profile.partner2.name;
-    onUpdateWeatherNote?.(partner, {
-      text: presets[nextIndex],
-      author: sender,
-      updatedAt: new Date().toISOString(),
-    });
+    const defaultPreset = targetPartner === 'partner1' ? millaPresets[0] : cassiPresets[0];
+    setNoteText(defaultPreset);
   };
 
   const p1CustomNote = weatherNotes?.partner1Note;
   const p2CustomNote = weatherNotes?.partner2Note;
+
+  const p1DisplayText = p1CustomNote?.text || millaPresets[0];
+  const p1Author = p1CustomNote?.author || profile.partner2.nickname || profile.partner2.name;
+
+  const p2DisplayText = p2CustomNote?.text || cassiPresets[0];
+  const p2Author = p2CustomNote?.author || profile.partner1.nickname || profile.partner1.name;
 
   return (
     <section
@@ -306,39 +311,39 @@ export const CoupleWeatherCare: React.FC<CoupleWeatherCareProps> = ({
           </div>
 
           {/* Recadinho de Carinho */}
-          <div className="space-y-1.5">
+          <div className="space-y-2">
             <div
-              onClick={() => handleCyclePresetAndSave('partner1')}
-              className={`p-2.5 rounded-xl border transition-all flex items-start gap-2 select-none cursor-pointer ${
+              onClick={() => handleOpenNoteModal('partner1')}
+              className={`p-3 rounded-2xl border transition-all flex items-start gap-2.5 select-none cursor-pointer ${
                 p1CustomNote
-                  ? 'bg-amber-100/40 dark:bg-amber-950/30 border-amber-300 dark:border-amber-800 hover:bg-amber-100/60'
-                  : 'bg-white/80 dark:bg-[#20171D]/80 border-amber-200/60 dark:border-amber-900/40 hover:bg-white dark:hover:bg-[#20171D]'
+                  ? 'bg-amber-100/50 dark:bg-amber-950/35 border-amber-300 dark:border-amber-800 hover:bg-amber-100/70 shadow-2xs'
+                  : 'bg-white/90 dark:bg-[#20171D]/90 border-amber-200/70 dark:border-amber-900/50 hover:bg-white dark:hover:bg-[#20171D]'
               }`}
-              title="Toque para alternar e salvar outro recadinho carinhoso"
+              title="Toque para editar o recadinho carinhoso"
             >
-              <span className="text-sm shrink-0">💌</span>
+              <span className="text-base shrink-0 mt-0.5">💌</span>
               <div className="flex-1 min-w-0">
-                <p className="text-[11px] leading-relaxed text-[#5C4D53] dark:text-[#D1C2C8] italic">
-                  "{p1CustomNote ? p1CustomNote.text : millaPresets[millaNoteIndex]}"
+                <p className="text-xs leading-relaxed text-[#4A3D43] dark:text-[#E2D8DD] italic">
+                  "{p1DisplayText}"
                 </p>
-                {p1CustomNote && (
-                  <p className="text-[10px] font-semibold text-amber-800 dark:text-amber-300 mt-1 not-italic flex items-center justify-between">
-                    <span>— De {p1CustomNote.author} com carinho 💕</span>
-                    <span className="text-[9px] text-[#7D6F74] font-normal">Toque para trocar</span>
-                  </p>
-                )}
+                <div className="flex items-center justify-between text-[10px] text-amber-800 dark:text-amber-300 font-semibold mt-1.5 not-italic">
+                  <span>— De {p1Author} com carinho 💕</span>
+                  <span className="text-[10px] text-[#E07A8B] font-medium flex items-center gap-1">
+                    <Pencil className="w-2.5 h-2.5" /> Editar
+                  </span>
+                </div>
               </div>
             </div>
 
             {/* Action button to write or generate with AI */}
-            <div className="flex items-center justify-end gap-1.5">
+            <div className="flex items-center justify-end">
               <button
                 type="button"
                 onClick={() => handleOpenNoteModal('partner1')}
-                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-white dark:bg-[#20171D] text-[#E07A8B] border border-[#E07A8B]/30 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors shadow-2xs cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-[#20171D] text-[#E07A8B] border border-[#E07A8B]/30 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors shadow-2xs cursor-pointer"
               >
-                <Sparkles className="w-3 h-3 text-[#E07A8B]" />
-                <span>{p1CustomNote ? 'Editar Recadinho' : 'Escrever / Gerar com IA'}</span>
+                <Sparkles className="w-3.5 h-3.5 text-[#E07A8B]" />
+                <span>Editar Recadinho</span>
               </button>
             </div>
           </div>
@@ -386,75 +391,92 @@ export const CoupleWeatherCare: React.FC<CoupleWeatherCareProps> = ({
           </div>
 
           {/* Recadinho de Carinho */}
-          <div className="space-y-1.5">
+          <div className="space-y-2">
             <div
-              onClick={() => handleCyclePresetAndSave('partner2')}
-              className={`p-2.5 rounded-xl border transition-all flex items-start gap-2 select-none cursor-pointer ${
+              onClick={() => handleOpenNoteModal('partner2')}
+              className={`p-3 rounded-2xl border transition-all flex items-start gap-2.5 select-none cursor-pointer ${
                 p2CustomNote
-                  ? 'bg-cyan-100/40 dark:bg-cyan-950/30 border-cyan-300 dark:border-cyan-800 hover:bg-cyan-100/60'
-                  : 'bg-white/80 dark:bg-[#192026]/80 border-cyan-200/60 dark:border-cyan-900/40 hover:bg-white dark:hover:bg-[#192026]'
+                  ? 'bg-cyan-100/50 dark:bg-cyan-950/35 border-cyan-300 dark:border-cyan-800 hover:bg-cyan-100/70 shadow-2xs'
+                  : 'bg-white/90 dark:bg-[#192026]/90 border-cyan-200/70 dark:border-cyan-900/50 hover:bg-white dark:hover:bg-[#192026]'
               }`}
-              title="Toque para alternar e salvar outro recadinho carinhoso"
+              title="Toque para editar o recadinho carinhoso"
             >
-              <span className="text-sm shrink-0">💌</span>
+              <span className="text-base shrink-0 mt-0.5">💌</span>
               <div className="flex-1 min-w-0">
-                <p className="text-[11px] leading-relaxed text-[#5C4D53] dark:text-[#C5D0D6] italic">
-                  "{p2CustomNote ? p2CustomNote.text : cassiPresets[cassiNoteIndex]}"
+                <p className="text-xs leading-relaxed text-[#3D474D] dark:text-[#DCE5EB] italic">
+                  "{p2DisplayText}"
                 </p>
-                {p2CustomNote && (
-                  <p className="text-[10px] font-semibold text-cyan-800 dark:text-cyan-300 mt-1 not-italic flex items-center justify-between">
-                    <span>— De {p2CustomNote.author} com carinho 💕</span>
-                    <span className="text-[9px] text-[#7D6F74] font-normal">Toque para trocar</span>
-                  </p>
-                )}
+                <div className="flex items-center justify-between text-[10px] text-cyan-800 dark:text-cyan-300 font-semibold mt-1.5 not-italic">
+                  <span>— De {p2Author} com carinho 💕</span>
+                  <span className="text-[10px] text-[#E07A8B] font-medium flex items-center gap-1">
+                    <Pencil className="w-2.5 h-2.5" /> Editar
+                  </span>
+                </div>
               </div>
             </div>
 
             {/* Action button to write or generate with AI */}
-            <div className="flex items-center justify-end gap-1.5">
+            <div className="flex items-center justify-end">
               <button
                 type="button"
                 onClick={() => handleOpenNoteModal('partner2')}
-                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-white dark:bg-[#192026] text-[#E07A8B] border border-[#E07A8B]/30 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors shadow-2xs cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-[#192026] text-[#E07A8B] border border-[#E07A8B]/30 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors shadow-2xs cursor-pointer"
               >
-                <Sparkles className="w-3 h-3 text-[#E07A8B]" />
-                <span>{p2CustomNote ? 'Editar Recadinho' : 'Escrever / Gerar com IA'}</span>
+                <Sparkles className="w-3.5 h-3.5 text-[#E07A8B]" />
+                <span>Editar Recadinho</span>
               </button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Modal: Escrever ou Gerar Recadinho com IA */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="w-full max-w-md bg-white dark:bg-[#251B21] rounded-3xl border border-[#F2E8E4] dark:border-[#3D2F36] shadow-xl overflow-hidden animate-in zoom-in-95 duration-200">
-            {/* Modal Header */}
-            <div className="px-5 py-4 border-b border-[#F2E8E4] dark:border-[#3D2F36] flex items-center justify-between bg-gradient-to-r from-rose-50/60 to-transparent dark:from-rose-950/20">
-              <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded-xl bg-[#E07A8B]/10 text-[#E07A8B]">
-                  <Sparkles className="w-4 h-4" />
+      {/* Modal: Escrever ou Gerar Recadinho com IA usando createPortal para nunca cortar nem bugar no PC/Mobile */}
+      {isModalOpen && typeof document !== 'undefined' && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-200">
+          {/* Backdrop dismiss */}
+          <div
+            className="fixed inset-0"
+            onClick={() => setIsModalOpen(false)}
+            aria-hidden="true"
+          />
+
+          {/* Modal Dialog Card */}
+          <div
+            className="relative w-full max-w-lg max-h-[92vh] sm:max-h-[85vh] bg-white dark:bg-[#20171D] rounded-3xl border border-[#F2E8E4] dark:border-[#3D2F36] shadow-2xl flex flex-col overflow-hidden z-10 animate-in zoom-in-95 duration-200"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="weather-note-modal-title"
+          >
+            {/* Sticky Solid Header */}
+            <div className="px-5 py-3.5 sm:py-4 border-b border-[#F2E8E4] dark:border-[#3D2F36] flex items-center justify-between bg-white dark:bg-[#20171D] shrink-0">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="p-2 rounded-xl bg-rose-50 dark:bg-rose-950/50 text-[#E07A8B] shrink-0">
+                  <Heart className="w-4 h-4 fill-current" />
                 </div>
-                <div>
-                  <h4 className="text-sm font-bold text-[#2D2327] dark:text-[#FAF4F0]">
+                <div className="min-w-0">
+                  <h3
+                    id="weather-note-modal-title"
+                    className="text-sm sm:text-base font-bold text-[#2D2327] dark:text-[#FAF4F0] leading-tight truncate"
+                  >
                     Recadinho de Clima
-                  </h4>
-                  <p className="text-[11px] text-[#7D6F74] dark:text-[#B8A8AF]">
-                    Para {targetPartner === 'partner1' ? profile.partner1.nickname || profile.partner1.name : profile.partner2.nickname || profile.partner2.name}
+                  </h3>
+                  <p className="text-[11px] text-[#7D6F74] dark:text-[#B8A8AF] truncate">
+                    Para {targetPartner === 'partner1' ? profile.partner1.nickname || profile.partner1.name : profile.partner2.nickname || profile.partner2.name} em {targetPartner === 'partner1' ? 'João Pessoa' : 'Porto Alegre'} ({targetPartner === 'partner1' ? `${weather.joaoPessoa.temp}°C` : `${weather.portoAlegre.temp}°C`})
                   </p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="p-1.5 rounded-xl text-[#7D6F74] hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
+                aria-label="Fechar modal"
+                className="p-1.5 rounded-xl text-[#7D6F74] hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer shrink-0"
               >
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Modal Body */}
-            <div className="p-5 space-y-4">
+            {/* Scrollable Modal Body */}
+            <div className="p-4 sm:p-5 space-y-4 overflow-y-auto flex-1 overscroll-contain">
               {/* Option A: Generate with Gemini AI */}
               <div className="p-3.5 rounded-2xl bg-[#FAF8F5] dark:bg-[#1E161A] border border-[#F2E8E4] dark:border-[#3D2F36] space-y-2.5">
                 <div className="flex items-center justify-between">
@@ -467,8 +489,8 @@ export const CoupleWeatherCare: React.FC<CoupleWeatherCareProps> = ({
                   </span>
                 </div>
 
-                <p className="text-[11px] text-[#7D6F74] dark:text-[#B8A8AF]">
-                  A IA analisa o clima atual de {targetPartner === 'partner1' ? 'João Pessoa' : 'Porto Alegre'} ({targetPartner === 'partner1' ? `${weather.joaoPessoa.temp}°C` : `${weather.portoAlegre.temp}°C`}) e cria uma mensagem carinhosa.
+                <p className="text-[11px] text-[#7D6F74] dark:text-[#B8A8AF] leading-relaxed">
+                  A IA analisa o clima atual de {targetPartner === 'partner1' ? 'João Pessoa' : 'Porto Alegre'} ({targetPartner === 'partner1' ? `${weather.joaoPessoa.temp}°C` : `${weather.portoAlegre.temp}°C`}) e sugere uma mensagem carinhosa personalizada.
                 </p>
 
                 <div className="space-y-1.5">
@@ -483,7 +505,7 @@ export const CoupleWeatherCare: React.FC<CoupleWeatherCareProps> = ({
                     type="button"
                     onClick={handleGenerateAINote}
                     disabled={isGeneratingAI}
-                    className="w-full h-8.5 rounded-xl bg-gradient-to-r from-[#E07A8B] to-[#d66a7b] hover:opacity-95 text-white text-xs font-semibold flex items-center justify-center gap-1.5 shadow-xs transition-opacity cursor-pointer disabled:opacity-50"
+                    className="w-full h-9 rounded-xl bg-gradient-to-r from-[#E07A8B] to-[#d66a7b] hover:opacity-95 text-white text-xs font-semibold flex items-center justify-center gap-1.5 shadow-xs transition-opacity cursor-pointer disabled:opacity-50"
                   >
                     {isGeneratingAI ? (
                       <>
@@ -505,10 +527,10 @@ export const CoupleWeatherCare: React.FC<CoupleWeatherCareProps> = ({
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-bold text-[#2D2327] dark:text-[#FAF4F0] flex items-center gap-1.5">
                     <Pencil className="w-3.5 h-3.5 text-[#E07A8B]" />
-                    Seu Recadinho (você pode editar livremente):
+                    Seu Recadinho (edite livremente):
                   </label>
                   {noteText.trim() && (
-                    <span className="text-[10px] text-[#7D6F74]">
+                    <span className="text-[10px] text-[#7D6F74] dark:text-[#B8A8AF]">
                       {noteText.length} caracteres
                     </span>
                   )}
@@ -526,7 +548,7 @@ export const CoupleWeatherCare: React.FC<CoupleWeatherCareProps> = ({
               {/* Option C: Clickable Quick Presets */}
               <div className="space-y-1.5">
                 <span className="text-[11px] font-bold text-[#7D6F74] dark:text-[#B8A8AF] block">
-                  💡 Ou escolha uma sugestão pronta com 1 toque:
+                  💡 Ou clique em uma sugestão para preencher o texto acima:
                 </span>
                 <div className="grid grid-cols-1 gap-1.5 max-h-36 overflow-y-auto pr-1">
                   {(targetPartner === 'partner1' ? millaPresets : cassiPresets).map((preset, idx) => (
@@ -534,9 +556,9 @@ export const CoupleWeatherCare: React.FC<CoupleWeatherCareProps> = ({
                       key={idx}
                       type="button"
                       onClick={() => setNoteText(preset)}
-                      className={`p-2 rounded-xl text-left text-[11px] leading-snug border transition-all cursor-pointer ${
+                      className={`p-2.5 rounded-xl text-left text-xs leading-snug border transition-all cursor-pointer ${
                         noteText === preset
-                          ? 'bg-rose-50 dark:bg-rose-950/60 border-[#E07A8B] text-[#E07A8B] font-medium'
+                          ? 'bg-rose-50 dark:bg-rose-950/60 border-[#E07A8B] text-[#E07A8B] font-medium shadow-2xs'
                           : 'bg-[#FAF8F5] dark:bg-[#1F171C] border-[#F2E8E4] dark:border-[#3D2F36] text-[#5C4D53] dark:text-[#D1C2C8] hover:border-[#E07A8B]/60'
                       }`}
                     >
@@ -545,50 +567,51 @@ export const CoupleWeatherCare: React.FC<CoupleWeatherCareProps> = ({
                   ))}
                 </div>
               </div>
+            </div>
 
-              {/* Modal Actions */}
-              <div className="flex items-center justify-between gap-2 pt-2 border-t border-[#F2E8E4] dark:border-[#3D2F36]">
+            {/* Sticky Solid Footer with Actions */}
+            <div className="p-3.5 sm:p-4 border-t border-[#F2E8E4] dark:border-[#3D2F36] flex items-center justify-between gap-2 bg-[#FAF8F5] dark:bg-[#1C1419] shrink-0">
+              <button
+                type="button"
+                onClick={handleResetNote}
+                className="h-9 px-3 rounded-xl border border-dashed border-[#F2E8E4] dark:border-[#3D2F36] text-[11px] font-semibold text-[#7D6F74] hover:text-rose-600 dark:hover:text-rose-400 transition-colors flex items-center gap-1.5 cursor-pointer bg-white dark:bg-[#20171D]"
+                title="Restaurar sugestão inicial"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>Sugestão Padrão</span>
+              </button>
+
+              <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={handleResetNote}
-                  className="h-9 px-3 rounded-xl border border-dashed border-[#F2E8E4] dark:border-[#3D2F36] text-[11px] font-semibold text-[#7D6F74] hover:text-rose-600 dark:hover:text-rose-400 transition-colors flex items-center gap-1 cursor-pointer"
-                  title="Restaurar recadinho padrão"
+                  onClick={() => setIsModalOpen(false)}
+                  className="h-9 px-3.5 rounded-xl text-xs font-semibold text-[#7D6F74] dark:text-[#B8A8AF] hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
                 >
-                  <RotateCcw className="w-3 h-3" />
-                  <span>Restaurar Padrão</span>
+                  Cancelar
                 </button>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setIsModalOpen(false)}
-                    className="h-9 px-3.5 rounded-xl text-xs font-semibold text-[#7D6F74] dark:text-[#B8A8AF] hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleSaveNote}
-                    disabled={saveSuccess}
-                    className="h-9 px-4 rounded-xl bg-[#E07A8B] hover:bg-[#d66a7b] text-white text-xs font-semibold flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
-                  >
-                    {saveSuccess ? (
-                      <>
-                        <Check className="w-3.5 h-3.5" />
-                        <span>Salvo!</span>
-                      </>
-                    ) : (
-                      <>
-                        <Send className="w-3.5 h-3.5" />
-                        <span>Salvar no Clima 💕</span>
-                      </>
-                    )}
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  onClick={handleSaveNote}
+                  disabled={saveSuccess}
+                  className="h-9 px-4 rounded-xl bg-[#E07A8B] hover:bg-[#d66a7b] text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer disabled:opacity-80"
+                >
+                  {saveSuccess ? (
+                    <>
+                      <Check className="w-4 h-4" />
+                      <span>Salvo com sucesso!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-3.5 h-3.5" />
+                      <span>Salvar no Clima 💕</span>
+                    </>
+                  )}
+                </button>
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </section>
   );

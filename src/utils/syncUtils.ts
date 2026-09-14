@@ -170,16 +170,16 @@ export function smartMergeAppData(
     city: normIncoming.profile.partner2?.city || normLocal.profile.partner2?.city,
   };
 
-  const p1Pin = normIncoming.profile.security?.partner1Pin && normIncoming.profile.security.partner1Pin !== '1234'
-    ? normIncoming.profile.security.partner1Pin
-    : (normLocal.profile.security?.partner1Pin || '1234');
+  const p1Pin = normIncoming.profile.security?.partner1Pin?.trim()
+    ? normIncoming.profile.security.partner1Pin.trim()
+    : (normLocal.profile.security?.partner1Pin || '2604');
 
-  const p2Pin = normIncoming.profile.security?.partner2Pin && normIncoming.profile.security.partner2Pin !== '5678'
-    ? normIncoming.profile.security.partner2Pin
+  const p2Pin = normIncoming.profile.security?.partner2Pin?.trim()
+    ? normIncoming.profile.security.partner2Pin.trim()
     : (normLocal.profile.security?.partner2Pin || '5678');
 
-  const couplePasscode = normIncoming.profile.security?.couplePasscode && normIncoming.profile.security.couplePasscode !== '2026'
-    ? normIncoming.profile.security.couplePasscode
+  const couplePasscode = normIncoming.profile.security?.couplePasscode?.trim()
+    ? normIncoming.profile.security.couplePasscode.trim()
     : (normLocal.profile.security?.couplePasscode || '2026');
 
   const security = {

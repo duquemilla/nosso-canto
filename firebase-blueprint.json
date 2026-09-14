@@ -1,0 +1,30 @@
+{
+  "entities": {
+    "CoupleData": {
+      "title": "CoupleData",
+      "description": "Dados completos do aplicativo do casal (perfil, lista, agenda, recadinhos e fotos)",
+      "type": "object",
+      "properties": {
+        "payload": {
+          "type": "object",
+          "description": "Estado serializado de todo o aplicativo do casal"
+        },
+        "lastModified": {
+          "type": "number",
+          "description": "Timestamp de última alteração"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Data ISO de sincronização"
+        }
+      },
+      "required": ["payload"]
+    }
+  },
+  "firestore": {
+    "/coupleData/main": {
+      "schema": "CoupleData",
+      "description": "Documento central de dados compartilhados do casal"
+    }
+  }
+}

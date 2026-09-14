@@ -121,16 +121,16 @@ export function mergeAppData(existing: AppData, incoming: AppData): AppData {
     city: incoming.profile.partner2?.city || existing.profile.partner2?.city,
   };
 
-  const p1Pin = incoming.profile.security?.partner1Pin && incoming.profile.security.partner1Pin !== '1234'
-    ? incoming.profile.security.partner1Pin
-    : (existing.profile.security?.partner1Pin || '1234');
+  const p1Pin = incoming.profile.security?.partner1Pin?.trim()
+    ? incoming.profile.security.partner1Pin.trim()
+    : (existing.profile.security?.partner1Pin || '2604');
 
-  const p2Pin = incoming.profile.security?.partner2Pin && incoming.profile.security.partner2Pin !== '5678'
-    ? incoming.profile.security.partner2Pin
+  const p2Pin = incoming.profile.security?.partner2Pin?.trim()
+    ? incoming.profile.security.partner2Pin.trim()
     : (existing.profile.security?.partner2Pin || '5678');
 
-  const couplePasscode = incoming.profile.security?.couplePasscode && incoming.profile.security.couplePasscode !== '2026'
-    ? incoming.profile.security.couplePasscode
+  const couplePasscode = incoming.profile.security?.couplePasscode?.trim()
+    ? incoming.profile.security.couplePasscode.trim()
     : (existing.profile.security?.couplePasscode || '2026');
 
   const security = {

@@ -23,7 +23,7 @@ export const cleanAppData: AppData = {
     anniversaryNote: 'Meu coração fez a melhor escolha. 💕',
     coverPhoto: 'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=1200&q=80',
     security: {
-      partner1Pin: '1234',
+      partner1Pin: '2604',
       partner2Pin: '5678',
       couplePasscode: '2026',
       requirePinOnEveryOpen: false,
